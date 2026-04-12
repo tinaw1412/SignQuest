@@ -1,0 +1,245 @@
+import React, { useState } from 'react';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../context/AuthContext';
+import { useLessonProgress } from '../../context/LessonProgressContext';
+import LessonVideoPlayer, { Sign } from './GreetingsVideoPlayer';
+import GreetingsQuiz from './GreetingsQuiz';
+
+const SIGNS: Sign[] = [
+  { 
+    id: 0, 
+    label: 'Hello', 
+    emoji: '👋', 
+    description: 'Open hand wave — the most common ASL greeting',
+    videoUri: require('../../../videos/hello.mp4'),
+    tips: [
+      '• Keep fingers together, palm facing out',
+      '• Wave smoothly — not too fast',
+      '• Make eye contact while signing',
+    ]
+  },
+  { 
+    id: 1, 
+    label: 'Nice to meet you', 
+    emoji: '🤝', 
+    description: 'Flat hands rotate toward each other at chest',
+    videoUri: require('../../../videos/nicetomeetyou.mp4'),
+    tips: [
+      '• Both hands flat, fingertips touching',
+      '• Rotate fingertips toward the other person',
+      '• Keep at chest height',
+    ]
+  },
+  { 
+    id: 2, 
+    label: 'See you later', 
+    emoji: '✌️', 
+    description: '"L" handshape moves forward from chin',
+    videoUri: require('../../../videos/seeyoulater.mp4'),
+    tips: [
+      '• Form an "L" with your dominant hand',
+      '• Start near your chin, push forward slightly',
+      '• Pair with a nod or smile',
+    ]
+  },
+];
+
+type Phase = 'learn' | 'quiz' | 'complete';
+
+export default function GreetingsLesson() {
+  const { awardXp } = useAuth();
+  const navigation = useNavigation();
+  const { greetingsWatched, setGreetingsWatched, setGreetingsQuizIndex, setGreetingsQuizScore, setGreetingsQuizCompleted } = useLessonProgress();
+  const [phase, setPhase] = useState<Phase>('learn');
+  const [activeVideo, setActiveVideo] = useState<Sign | null>(null);
+
+  const markWatched = async (id: number) => {
+    if (greetingsWatched[id]) return;
+    const updated = [...greetingsWatched];
+    updated[id] = true;
+    setGreetingsWatched(updated);
+    await awardXp(50);
+  };
+
+  const completedCount = greetingsWatched.filter(Boolean).length;
+  const progressPercent = Math.round((completedCount / SIGNS.length) * 100);
+  const allWatched = completedCount === SIGNS.length;
+
+  const handleQuizComplete = async (score: number) => {
+    if (score === 4) await awardXp(100);
+    setPhase('complete');
+  };
+
+  if (activeVideo) {
+    return (
+      <LessonVideoPlayer
+        sign={activeVideo}
+        onComplete={() => { markWatched(activeVideo.id); setActiveVideo(null); }}
+        onBack={() => setActiveVideo(null)}
+        lessonName="Greetings"
+      />
+    );
+  }
+
+  if (phase === 'quiz') {
+    return <GreetingsQuiz onComplete={handleQuizComplete} />;
+  }
+
+  if (phase === 'complete') {
+    return <LessonComplete onBack={() => (navigation as any).goBack()} onRestart={() => {
+      setGreetingsQuizIndex(0);
+      setGreetingsQuizScore(0);
+      setGreetingsQuizCompleted(false);
+      setPhase('quiz');
+    }} />;
+  }
+
+  return (
+    <ScrollView 
+      style={styles.scrollView} // <--- Added this to color the ScrollView itself
+      contentContainerStyle={styles.container} 
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Header */}
+      <TouchableOpacity style={styles.backBtn} onPress={() => (navigation as any).goBack()}>
+        <Text style={styles.backBtnText}>← Back</Text>
+      </TouchableOpacity>
+      <Text style={styles.title}>Lesson 2: Greetings</Text>
+
+      {/* Progress bar */}
+      <View style={styles.progressWrap}>
+        <View style={[styles.progressFill, { width: `${progressPercent}%` as any }]} />
+      </View>
+      <View style={styles.progRow}>
+        <Text style={styles.progText}>{completedCount} / {SIGNS.length} signs watched</Text>
+        <Text style={styles.progText}>+50 XP each</Text>
+      </View>
+
+      {/* Sign cards */}
+      {SIGNS.map((sign) => (
+        <TouchableOpacity
+          key={sign.id}
+          style={[styles.signCard, greetingsWatched[sign.id] && styles.signCardDone]}
+          onPress={() => setActiveVideo(sign)}
+          accessibilityRole="button"
+        >
+          <Text style={styles.signEmoji}>{sign.emoji}</Text>
+          <View style={styles.signInfo}>
+            <View style={styles.signLabelRow}>
+              <Text style={styles.signLabel}>{sign.label}</Text>
+              <View style={[styles.badge, greetingsWatched[sign.id] ? styles.badgeDone : styles.badgeNext]}>
+                <Text style={[styles.badgeText, greetingsWatched[sign.id] ? styles.badgeTextDone : styles.badgeTextNext]}>
+                  {greetingsWatched[sign.id] ? 'Done ✓' : 'Watch'}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.signDesc}>{sign.description}</Text>
+          </View>
+        </TouchableOpacity>
+      ))}
+
+      {/* Continue button */}
+      <TouchableOpacity
+        style={[styles.continueBtn, !allWatched && styles.continueBtnDisabled]}
+        onPress={() => setPhase('quiz')}
+        disabled={!allWatched}
+        accessibilityRole="button"
+      >
+        <Text style={styles.continueBtnText}>
+          {allWatched ? 'Continue to Quiz →' : `Watch all signs to continue (${completedCount}/${SIGNS.length})`}
+        </Text>
+      </TouchableOpacity>
+      
+      {/* Removed the empty 140px view that was pushing things up unnecessarily */}
+    </ScrollView>
+  );
+}
+
+function LessonComplete({ onBack, onRestart }: { onBack: () => void; onRestart: () => void }) {
+  const { user } = useAuth();
+  return (
+    <View style={styles.completeContainer}>
+      <Text style={styles.completeTitle}>Lesson Complete! 🎉</Text>
+      <View style={styles.completeCard}>
+        <Text style={styles.completeCardTitle}>You earned:</Text>
+        <Text style={styles.completeReward}>⭐  +250 XP total</Text>
+        <Text style={styles.completeReward}>🔥  Streak maintained</Text>
+        <View style={styles.divider} />
+        <Text style={styles.completeSub}>Signs mastered:</Text>
+        <Text style={styles.completeSigns}>👋 Hello  •  🤝 Nice to meet you  •  ✌️ See you later</Text>
+      </View>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.nextBtn} onPress={onBack}>
+          <Text style={styles.nextBtnText}>Back to Lessons →</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.restartBtn} onPress={onRestart}>
+          <Text style={styles.restartBtnText}>Retake Quiz</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  scrollView: { 
+    flex: 1, 
+    backgroundColor: '#23254b' // <--- Fills the "white" space behind the content
+  },
+  container: { 
+    flexGrow: 1, // <--- Tells the inner content to stretch to the bottom
+    padding: 20, 
+    paddingBottom: 40, 
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    backgroundColor: '#23254b' 
+  },
+  backBtn: { 
+    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    borderRadius: 8, 
+    backgroundColor: '#3a3d6e',
+    marginBottom: 16,
+  },
+  backBtnText: { color: '#6fb0ff', fontSize: 13, fontWeight: '600' },
+  title: { color: '#fff', fontSize: 26, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
+  progressWrap: { height: 6, borderRadius: 4, backgroundColor: '#3a3d6e', overflow: 'hidden', marginBottom: 6 },
+  progressFill: { height: 6, backgroundColor: '#6fb0ff', borderRadius: 4 },
+  progRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 18 },
+  progText: { color: '#9fb0ff', fontSize: 12 },
+  signCard: { flexDirection: 'row', alignItems: 'center', gap: 14, borderWidth: 2, borderColor: '#6fb0ff', borderRadius: 14, padding: 14, marginBottom: 12, backgroundColor: '#1d1f3d' },
+  signCardDone: { borderColor: '#3fc98e' },
+  signEmoji: { fontSize: 26, width: 44, textAlign: 'center' },
+  signInfo: { flex: 1 },
+  signLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+  signLabel: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  signDesc: { color: '#9fb0ff', fontSize: 12, marginTop: 4 },
+  badge: { paddingHorizontal: 9, paddingVertical: 3, borderRadius: 20 },
+  badgeNext: { backgroundColor: '#1e2a5a' },
+  badgeDone: { backgroundColor: '#0e3d27' },
+  badgeText: { fontSize: 11, fontWeight: '600' },
+  badgeTextNext: { color: '#7fe9ff' },
+  badgeTextDone: { color: '#3fc98e' },
+  continueBtn: {
+    marginTop: 24,
+    backgroundColor: '#6fb0ff',
+    borderRadius: 28,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  continueBtnDisabled: { backgroundColor: '#3a3d6e' },
+  continueBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  // Complete screen
+  completeContainer: { flex: 1, backgroundColor: '#23254b', padding: 24, justifyContent: 'center' },
+  completeTitle: { color: '#fff', fontSize: 32, fontWeight: '700', textAlign: 'center', marginBottom: 28 },
+  completeCard: { borderWidth: 2, borderColor: '#6fb0ff', borderRadius: 18, padding: 22, backgroundColor: '#1d1f3d', marginBottom: 28 },
+  completeCardTitle: { color: '#9fb0ff', fontSize: 14, marginBottom: 12 },
+  completeReward: { color: '#fff', fontSize: 18, fontWeight: '600', marginBottom: 8 },
+  divider: { height: 1, backgroundColor: '#3a3d6e', marginVertical: 14 },
+  completeSub: { color: '#9fb0ff', fontSize: 13, marginBottom: 6 },
+  completeSigns: { color: '#fff', fontSize: 14, lineHeight: 22 },
+  buttonRow: { flexDirection: 'row', gap: 12 },
+  nextBtn: { flex: 1, backgroundColor: '#6fb0ff', borderRadius: 28, paddingVertical: 14, alignItems: 'center' },
+  nextBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  restartBtn: { flex: 1, backgroundColor: '#3a3d6e', borderWidth: 2, borderColor: '#6fb0ff', borderRadius: 28, paddingVertical: 14, alignItems: 'center' },
+  restartBtnText: { color: '#6fb0ff', fontSize: 16, fontWeight: '700' },
+});

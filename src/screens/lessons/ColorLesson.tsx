@@ -3,7 +3,7 @@ import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Platform } from '
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { useLessonProgress } from '../../context/LessonProgressContext';
-import LessonVideoPlayer, { Sign } from './GreetingsVideoPlayer';
+import LessonVideoPlayer, { Sign } from './LessonVideoPlay';
 import ColorQuiz from './ColorQuiz';
 
 const SIGNS: Sign[] = [

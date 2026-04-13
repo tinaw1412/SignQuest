@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 
 export default function Auth() {
@@ -28,54 +28,67 @@ export default function Auth() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>SignQuest</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.inner}>
+          <Text style={styles.logo}>SignQuest</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>{mode === 'login' ? 'Email' : 'First name'}</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>{mode === 'login' ? 'Email' : 'First name'}</Text>
 
-        {mode === 'login' ? (
-          <>
-            <TextInput placeholder="email or username" value={username} onChangeText={setUsername} style={styles.input} autoCapitalize="none" />
-            <Text style={styles.cardLabel}>Password</Text>
-            <TextInput placeholder="Password" value={password} onChangeText={setPassword} style={styles.input} secureTextEntry />
+            {mode === 'login' ? (
+              <>
+                <TextInput placeholder="email or username" value={username} onChangeText={setUsername} style={styles.input} autoCapitalize="none" />
+                <Text style={styles.cardLabel}>Password</Text>
+                <TextInput placeholder="Password" value={password} onChangeText={setPassword} style={styles.input} secureTextEntry />
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin} accessibilityRole="button">
-              <Text style={styles.loginButtonText}>Login</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.loginButton} onPress={handleLogin} accessibilityRole="button">
+                  <Text style={styles.loginButtonText}>Login</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setMode('signup')}>
-              <Text style={styles.link}>Create Account</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.link}>Forgot Password</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TextInput placeholder="First name" value={firstName} onChangeText={setFirstName} style={styles.input} />
-            <TextInput placeholder="Last name" value={lastName} onChangeText={setLastName} style={styles.input} />
-            <Text style={styles.cardLabel}>Email</Text>
-            <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" autoCapitalize="none" />
-            <TextInput placeholder="Username" value={signUpUsername} onChangeText={setSignUpUsername} style={styles.input} autoCapitalize="none" />
-            <TextInput placeholder="Password" value={signUpPassword} onChangeText={setSignUpPassword} style={styles.input} secureTextEntry />
+                <TouchableOpacity onPress={() => setMode('signup')}>
+                  <Text style={styles.link}>Create Account</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                  <Text style={styles.link}>Forgot Password</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <TextInput placeholder="First name" value={firstName} onChangeText={setFirstName} style={styles.input} />
+                <TextInput placeholder="Last name" value={lastName} onChangeText={setLastName} style={styles.input} />
+                <Text style={styles.cardLabel}>Email</Text>
+                <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} keyboardType="email-address" autoCapitalize="none" />
+                <TextInput placeholder="Username" value={signUpUsername} onChangeText={setSignUpUsername} style={styles.input} autoCapitalize="none" />
+                <TextInput placeholder="Password" value={signUpPassword} onChangeText={setSignUpPassword} style={styles.input} secureTextEntry />
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleSignup} accessibilityRole="button">
-              <Text style={styles.loginButtonText}>Create account</Text>
-            </TouchableOpacity>
+                <TouchableOpacity style={styles.loginButton} onPress={handleSignup} accessibilityRole="button">
+                  <Text style={styles.loginButtonText}>Create account</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setMode('login')}>
-              <Text style={styles.link}>Have an account? Log in</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
-    </View>
+                <TouchableOpacity onPress={() => setMode('login')}>
+                  <Text style={styles.link}>Have an account? Log in</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#23254b', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  container: { flex: 1, backgroundColor: '#23254b' },
+  inner: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
   logo: {
     color: '#7fe9ff',
     fontSize: 44,

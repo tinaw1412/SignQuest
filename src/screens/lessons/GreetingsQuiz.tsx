@@ -281,7 +281,7 @@ interface Props {
 
 export default function GreetingsQuiz({ onComplete, onBack }: Props) {
   const navigation = useNavigation();
-  const { greetingsQuizIndex, setGreetingsQuizIndex, greetingsQuizScore, setGreetingsQuizScore, setGreetingsQuizCompleted } = useLessonProgress();
+  const { greetingsQuizIndex, setGreetingsQuizIndex, greetingsQuizScore, setGreetingsQuizScore, greetingsQuizCompleted, setGreetingsQuizCompleted } = useLessonProgress();
   const [selected, setSelected] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -301,7 +301,9 @@ export default function GreetingsQuiz({ onComplete, onBack }: Props) {
   const handleNext = () => {
     const newScore = score; // already updated
     if (qIndex + 1 >= QUESTIONS.length) {
-      setGreetingsQuizCompleted(true);
+      if (!greetingsQuizCompleted) {
+        setGreetingsQuizCompleted(true);
+      }
       onComplete(newScore);
     } else {
       setGreetingsQuizIndex(qIndex + 1);

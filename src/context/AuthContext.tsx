@@ -180,10 +180,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     yesterday.setDate(today.getDate() - 1);
     const yIso = new Date(yesterday.getTime() - tzOffset).toISOString().slice(0, 10);
 
-    let newStreak = 1;
+    let newStreak = existing?.streak ?? user.streak ?? 1;
     if (prevDate === localIso) {
-      // already completed today
-      newStreak = existing?.streak ?? user.streak ?? 1;
+      // already completed today, so no change
     } else if (prevDate === yIso) {
       // consecutive
       newStreak = (existing?.streak ?? user.streak ?? 0) + 1;

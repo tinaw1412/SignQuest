@@ -261,7 +261,7 @@ interface Props {
 
 export default function ColorQuiz({ onComplete, onBack }: Props) {
   const navigation = useNavigation();
-  const { colorsQuizIndex, setColorsQuizIndex, colorsQuizScore, setColorsQuizScore, setColorsQuizCompleted } = useLessonProgress();
+  const { colorsQuizIndex, setColorsQuizIndex, colorsQuizScore, setColorsQuizScore, colorsQuizCompleted, setColorsQuizCompleted } = useLessonProgress();
   const [selected, setSelected] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -280,7 +280,9 @@ export default function ColorQuiz({ onComplete, onBack }: Props) {
 
   const handleNext = () => {
     if (qIndex + 1 >= QUESTIONS.length) {
-      setColorsQuizCompleted(true);
+      if (!colorsQuizCompleted) {
+        setColorsQuizCompleted(true);
+      }
       onComplete(score);
     } else {
       setColorsQuizIndex(qIndex + 1);

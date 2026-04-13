@@ -1,6 +1,11 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { useLessonProgress } from '../context/LessonProgressContext';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../App';
+import sampleUsers from '../data/sampleUsers';
 
 function ProgressBar({ percent }: { percent: number }) {
     return (
@@ -13,6 +18,27 @@ function ProgressBar({ percent }: { percent: number }) {
 
 export default function Dashboard() {
     const { user } = useAuth();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+    const { 
+        greetingsWatched,
+        greetingsQuizIndex,
+        greetingsQuizScore,
+        greetingsQuizCompleted, 
+        colorsWatched,
+        colorsQuizIndex,
+        colorsQuizScore,
+        colorsQuizCompleted, 
+        animalsWatched,
+        animalsQuizIndex,
+        animalsQuizScore,
+        animalsQuizCompleted, 
+        feelingsWatched,
+        feelingsQuizIndex,
+        feelingsQuizScore,
+        feelingsQuizCompleted,
+        dailyQuizCompletedDate 
+    } = useLessonProgress();
+
     const name = user ? user.firstName : 'there';
     const xp = user?.xp ?? 0;
     const level = user?.level ?? 1;
@@ -23,6 +49,52 @@ export default function Dashboard() {
     const currentLevelXp = (level - 1) * xpPerLevel;
     const nextLevelXp = level * xpPerLevel;
     const progressPercent = Math.max(0, Math.min(100, Math.round(((xp - currentLevelXp) / (nextLevelXp - currentLevelXp)) * 100)));
+
+    const getNextLesson = () => {
+        if (!greetingsQuizCompleted) {
+            const videosWatched = greetingsWatched.filter(Boolean).length;
+            const quizQuestionsAnswered = greetingsQuizIndex + (greetingsQuizScore > 0 ? 1 : 0);
+            const progress = Math.round(((videosWatched + quizQuestionsAnswered) / 17) * 100);
+            return { name: 'Lesson 1: Greetings', screen: 'GreetingsLesson' as keyof RootStackParamList, progress };
+        }
+        if (!colorsQuizCompleted) {
+            const videosWatched = colorsWatched.filter(Boolean).length;
+            const quizQuestionsAnswered = colorsQuizIndex + (colorsQuizScore > 0 ? 1 : 0);
+            const progress = Math.round(((videosWatched + quizQuestionsAnswered) / 14) * 100);
+            return { name: 'Lesson 2: Colors', screen: 'ColorLesson' as keyof RootStackParamList, progress };
+        }
+        if (!animalsQuizCompleted) {
+            const videosWatched = animalsWatched.filter(Boolean).length;
+            const quizQuestionsAnswered = animalsQuizIndex + (animalsQuizScore > 0 ? 1 : 0);
+            const progress = Math.round(((videosWatched + quizQuestionsAnswered) / 12) * 100);
+            return { name: 'Lesson 3: Animals', screen: 'AnimalLesson' as keyof RootStackParamList, progress };
+        }
+        if (!feelingsQuizCompleted) {
+            const videosWatched = feelingsWatched.filter(Boolean).length;
+            const quizQuestionsAnswered = feelingsQuizIndex + (feelingsQuizScore > 0 ? 1 : 0);
+            const progress = Math.round(((videosWatched + quizQuestionsAnswered) / 12) * 100);
+            return { name: 'Lesson 4: Feelings', screen: 'FeelingsLesson' as keyof RootStackParamList, progress };
+        }
+        return null; // All lessons completed
+    };
+
+    const nextLesson = getNextLesson();
+
+    const today = new Date().toISOString().slice(0, 10);
+    const dailyChallengeDone = dailyQuizCompletedDate === today;
+
+    const leaderboardUsers = [...sampleUsers];
+    if (user) {
+        const userInLeaderboard = leaderboardUsers.find(u => u.username === user.username);
+        if (userInLeaderboard) {
+            userInLeaderboard.xp = xp;
+        } else {
+            leaderboardUsers.push({ username: user.username, firstName: user.firstName, xp });
+        }
+    }
+    leaderboardUsers.sort((a, b) => b.xp - a.xp);
+    const top3 = leaderboardUsers.slice(0, 3);
+    const userRank = user ? leaderboardUsers.findIndex(u => u.username === user.username) + 1 : -1;
 
     return (
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -39,24 +111,39 @@ export default function Dashboard() {
             <ProgressBar percent={progressPercent} />
             <Text style={styles.level}>Level {level}</Text>
 
-            <View style={styles.largeCard}>
-                <Text style={styles.cardTitle}>Continue Lesson</Text>
-                <Text style={styles.cardSubtitle}>'Basics - Lesson 3'</Text>
-                <Text style={styles.cardProgress}>[70% Complete]</Text>
-            </View>
-
-            <View style={styles.largeCard}>
-                <Text style={styles.cardTitle}>🎯 Daily Challenge</Text>
-                <Text style={styles.cardSubtitle}>'Learn 3 New Signs'</Text>
-                <Text style={styles.cardAction}>[Start Challenge]</Text>
-            </View>
-
-                    <View style={styles.leaderboard}>
-                        <Text style={styles.leaderTitle}>🏆 Leaderboard Preview</Text>
-                        <Text style={styles.leaderRow}>1. Alex 3200 XP</Text>
-                        <Text style={styles.leaderRow}>2. {name} 2800 XP</Text>
-                        <Text style={styles.leaderRow}>3. Charles 2650 XP</Text>
+            {nextLesson ? (
+                <TouchableOpacity onPress={() => navigation.navigate(nextLesson.screen)}>
+                    <View style={styles.largeCard}>
+                        <Text style={styles.cardTitle}>Continue Lesson</Text>
+                        <Text style={styles.cardSubtitle}>{nextLesson.name}</Text>
+                        <Text style={styles.cardProgress}>[{nextLesson.progress}% Complete]</Text>
                     </View>
+                </TouchableOpacity>
+            ) : (
+                <View style={styles.largeCard}>
+                    <Text style={styles.cardTitle}>All Lessons Completed!</Text>
+                    <Text style={styles.cardSubtitle}>Check back for more soon.</Text>
+                </View>
+            )}
+
+            <TouchableOpacity onPress={() => !dailyChallengeDone && navigation.navigate('DailyQuiz')} disabled={dailyChallengeDone}>
+                <View style={styles.largeCard}>
+                    <Text style={styles.cardTitle}>🎯 Daily Challenge</Text>
+                    <Text style={styles.cardSubtitle}>{dailyChallengeDone ? "You've completed today's challenge!" : "Learn 3 New Signs"}</Text>
+                    <Text style={styles.cardAction}>{dailyChallengeDone ? "[Completed]" : "[Start Challenge]"}</Text>
+                </View>
+            </TouchableOpacity>
+
+            <View style={styles.leaderboard}>
+                <Text style={styles.leaderTitle}>🏆 Leaderboard Preview</Text>
+                {top3.map((u, index) => (
+                    <Text key={u.username} style={styles.leaderRow}>{index + 1}. {u.firstName} {u.xp} XP</Text>
+                ))}
+                {userRank > 3 && (
+                    <Text style={styles.leaderRow}>
+                    {userRank}. {name} {xp} XP</Text>
+                )}
+            </View>
 
             <View style={{ height: 40 }} />
         </ScrollView>

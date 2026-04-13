@@ -250,7 +250,7 @@ interface Props {
 
 export default function FeelingsQuiz({ onComplete, onBack }: Props) {
   const navigation = useNavigation();
-  const { feelingsQuizIndex, setFeelingsQuizIndex, feelingsQuizScore, setFeelingsQuizScore, setFeelingsQuizCompleted } = useLessonProgress();
+  const { feelingsQuizIndex, setFeelingsQuizIndex, feelingsQuizScore, setFeelingsQuizScore, feelingsQuizCompleted, setFeelingsQuizCompleted } = useLessonProgress();
   const [selected, setSelected] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -269,7 +269,9 @@ export default function FeelingsQuiz({ onComplete, onBack }: Props) {
 
   const handleNext = () => {
     if (qIndex + 1 >= QUESTIONS.length) {
-      setFeelingsQuizCompleted(true);
+      if (!feelingsQuizCompleted) {
+        setFeelingsQuizCompleted(true);
+      }
       onComplete(score);
     } else {
       setFeelingsQuizIndex(qIndex + 1);

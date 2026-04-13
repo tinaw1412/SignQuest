@@ -249,7 +249,7 @@ interface Props {
 
 export default function AnimalQuiz({ onComplete, onBack }: Props) {
   const navigation = useNavigation();
-  const { animalsQuizIndex, setAnimalsQuizIndex, animalsQuizScore, setAnimalsQuizScore, setAnimalsQuizCompleted } = useLessonProgress();
+  const { animalsQuizIndex, setAnimalsQuizIndex, animalsQuizScore, setAnimalsQuizScore, animalsQuizCompleted, setAnimalsQuizCompleted } = useLessonProgress();
   const [selected, setSelected] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -268,7 +268,9 @@ export default function AnimalQuiz({ onComplete, onBack }: Props) {
 
   const handleNext = () => {
     if (qIndex + 1 >= QUESTIONS.length) {
-      setAnimalsQuizCompleted(true);
+      if (!animalsQuizCompleted) {
+        setAnimalsQuizCompleted(true);
+      }
       onComplete(score);
     } else {
       setAnimalsQuizIndex(qIndex + 1);

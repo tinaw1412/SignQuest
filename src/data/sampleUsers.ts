@@ -1,12 +1,15 @@
 // Sample leaderboard users for development/demo purposes
 const sampleUsers = [
-  { username: 'alex', firstName: 'Alex', xp: 3200 },
-  { username: 'kevin', firstName: 'Kevin', xp: 2800 },
-  { username: 'charles', firstName: 'Charles', xp: 2650 },
-  { username: 'sam', firstName: 'Sam', xp: 2500 },
-  { username: 'tina', firstName: 'Tina', xp: 2000 },
-  { username: 'zach', firstName: 'Zach', xp: 1800 },
-  { username: 'flo', firstName: 'Flo', xp: 1200 },
+  { username: 'noah', firstName: 'Noah', xp: 4500 },
+  { username: 'liam', firstName: 'Liam', xp: 4200 },
+  { username: 'olivia', firstName: 'Olivia', xp: 3900 },
+  { username: 'emma', firstName: 'Emma', xp: 3600 },
+  { username: 'ava', firstName: 'Ava', xp: 3300 },
+  { username: 'lucas', firstName: 'Lucas', xp: 3000 },
+  { username: 'mia', firstName: 'Mia', xp: 2700 },
+  { username: 'henry', firstName: 'Henry', xp: 2400 },
+  { username: 'sofia', firstName: 'Sofia', xp: 2100 },
+  { username: 'leo', firstName: 'Leo', xp: 1800 },
 ];
 
 export default sampleUsers;

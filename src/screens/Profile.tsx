@@ -1,11 +1,41 @@
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { useLessonProgress } from '../context/LessonProgressContext';
 
 export default function Profile() {
   const { user, signOut } = useAuth();
+  const { 
+    greetingsQuizCompleted, 
+    colorsQuizCompleted, 
+    animalsQuizCompleted, 
+    feelingsQuizCompleted,
+    dailyQuizCompletedDate
+  } = useLessonProgress();
 
   const name = user ? `${user.firstName} ${user.lastName}` : 'Guest';
+  const level = user?.level ?? 1;
+  const xp = user?.xp ?? 0;
+  const streak = user?.streak ?? 0;
+
+  const lessonsCompleted = [greetingsQuizCompleted, colorsQuizCompleted, animalsQuizCompleted, feelingsQuizCompleted].filter(Boolean).length;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const dailyChallengeDone = dailyQuizCompletedDate === today;
+
+  const achievements = [];
+  if (streak >= 5) {
+    achievements.push('5 Day Streak');
+  }
+  if (lessonsCompleted >= 1) {
+    achievements.push('First Lesson');
+  }
+  if (lessonsCompleted >= 2) {
+    achievements.push('Second Lesson');
+  }
+  if (lessonsCompleted >= 4) {
+    achievements.push('All Lessons Completed');
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
@@ -17,23 +47,27 @@ export default function Profile() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardText}>Level 4</Text>
-        <Text style={styles.cardText}>XP: 2800</Text>
-        <Text style={styles.cardText}>🔥 Streak: 5 days</Text>
+        <Text style={styles.cardText}>Level {level}</Text>
+        <Text style={styles.cardText}>XP: {xp}</Text>
+        <Text style={styles.cardText}>🔥 Streak: {streak} days</Text>
       </View>
 
       <View style={styles.card}>
         <Text style={[styles.cardText, { fontWeight: '700' }]}>Stats:</Text>
-        <Text style={styles.cardText}>Lessons Completed: 2</Text>
-        <Text style={styles.cardText}>Challenges Done: 1</Text>
+        <Text style={styles.cardText}>Lessons Completed: {lessonsCompleted}</Text>
+        <Text style={styles.cardText}>Challenges Done: {dailyChallengeDone ? 1 : 0}</Text>
       </View>
 
       <View style={styles.card}>
         <Text style={[styles.cardText, { fontWeight: '700' }]}>Achievements:</Text>
         <View style={{ marginTop: 8 }}>
-          <Text style={styles.bullet}>• 5 Day Streak</Text>
-          <Text style={styles.bullet}>• First Lesson</Text>
-          <Text style={styles.bullet}>• Second Lesson</Text>
+          {achievements.length > 0 ? (
+            achievements.map((ach, index) => (
+              <Text key={index} style={styles.bullet}>• {ach}</Text>
+            ))
+          ) : (
+            <Text style={styles.cardText}>No achievements yet. Keep learning!</Text>
+          )}
         </View>
       </View>
 

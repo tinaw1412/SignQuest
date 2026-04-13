@@ -127,9 +127,10 @@ export default function Lessons() {
 
             <Text style={styles.sectionLabel}>Categories:</Text>
             <View style={styles.chipsRow}>
-                <SmallChip>Basics</SmallChip>
-                <SmallChip>Food</SmallChip>
-                <SmallChip>Phrases</SmallChip>
+                <SmallChip>Greetings</SmallChip>
+                <SmallChip>Colors</SmallChip>
+                <SmallChip>Animals</SmallChip>
+                <SmallChip>Feelings</SmallChip>
             </View>
 
             <LessonCard 
@@ -138,14 +139,24 @@ export default function Lessons() {
                 status={greetingsQuizCompleted ? 'completed' : 'inprogress'} 
                 onPress={() => navigation.navigate('GreetingsLesson')} 
             />
-            <LessonCard title="Lesson 2: Colors" progress={colorsProgress} status={colorsQuizCompleted ? 'completed' : 'inprogress'} onPress={() => navigation.navigate('ColorLesson')} />
+            <LessonCard 
+                title="Lesson 2: Colors" 
+                progress={colorsProgress} 
+                status={!greetingsQuizCompleted ? 'locked' : colorsQuizCompleted ? 'completed' : 'inprogress'} 
+                onPress={() => navigation.navigate('ColorLesson')} 
+            />
             <LessonCard 
                 title="Lesson 3: Animals" 
                 progress={animalsProgress} 
-                status={animalsQuizCompleted ? 'completed' : 'inprogress'} 
+                status={!colorsQuizCompleted ? 'locked' : animalsQuizCompleted ? 'completed' : 'inprogress'} 
                 onPress={() => navigation.navigate('AnimalLesson')} 
             />
-            <LessonCard title="Lesson 4: Feelings" progress={feelingsProgress} status={feelingsQuizCompleted ? 'completed' : 'inprogress'} onPress={() => navigation.navigate('FeelingsLesson')} />
+            <LessonCard 
+                title="Lesson 4: Feelings" 
+                progress={feelingsProgress} 
+                status={!animalsQuizCompleted ? 'locked' : feelingsQuizCompleted ? 'completed' : 'inprogress'} 
+                onPress={() => navigation.navigate('FeelingsLesson')} 
+            />
 
             <View style={{ height: 120 }} />
         </ScrollView>

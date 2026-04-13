@@ -4,10 +4,13 @@ import { StyleSheet, View, Platform } from 'react-native';
 import BottomNav from './src/components/BottomNav';
 import Dashboard from './src/screens/Dashboard';
 import Daily from './src/screens/Daily';
+import DailyQuiz from './src/screens/DailyQuiz';
 import Leaderboard from './src/screens/Leaderboard';
 import Profile from './src/screens/Profile';
 import GreetingsLesson from './src/screens/lessons/GreetingsLesson';
 import AnimalLesson from './src/screens/lessons/AnimalLesson';
+import ColorLesson from './src/screens/lessons/ColorLesson';
+import FeelingsLesson from './src/screens/lessons/FeelingsLesson';
 import Lessons from './src/screens/Lessons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { LessonProgressProvider } from './src/context/LessonProgressContext';
@@ -19,6 +22,9 @@ export type RootStackParamList = {
   MainTabs: undefined;
   GreetingsLesson: undefined;
   AnimalLesson: undefined;
+  ColorLesson: undefined;
+  FeelingsLesson: undefined;
+  DailyQuiz: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -58,6 +64,9 @@ function AppNavigator() {
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name="GreetingsLesson" component={GreetingsLesson} />
       <Stack.Screen name="AnimalLesson" component={AnimalLesson} />
+      <Stack.Screen name="ColorLesson" component={ColorLesson} />
+      <Stack.Screen name="FeelingsLesson" component={FeelingsLesson} />
+      <Stack.Screen name="DailyQuiz" component={DailyQuiz} />
     </Stack.Navigator>
   );
 }

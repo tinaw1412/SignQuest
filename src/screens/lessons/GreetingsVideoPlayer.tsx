@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
 
 export type Sign = { 
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#23254b',
     padding: 20,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
   },
   backBtn: {
     paddingHorizontal: 12,

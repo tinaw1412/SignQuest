@@ -11,11 +11,11 @@ const SIGNS: Sign[] = [
     id: 0, 
     label: 'Cat', 
     emoji: '🐱', 
-    description: 'Fingers near mouth, pull back with "C" handshape',
+    description: 'One hand near mouth, pull back with "C" handshape',
     videoUri: require('../../../videos/cat.mp4'),
     tips: [
-      '• Form a "C" handshape with both hands',
-      '• Position near the sides of your mouth',
+      '• Form a "C" handshape with one hand',
+      '• Position near the side of your mouth',
       '• Pull fingers back toward your face',
     ]
   },
@@ -35,24 +35,24 @@ const SIGNS: Sign[] = [
     id: 2, 
     label: 'Fish', 
     emoji: '🐠', 
-    description: 'Open hand moves forward, closing fingers',
+    description: 'Palm wiggling forward like a fish',
     videoUri: require('../../../videos/fish.mp4'),
     tips: [
-      '• Start with an open hand at mouth area',
-      '• Move hand forward and close fingers gradually',
-      '• Mimics fish mouth opening and closing',
+      '• Hold hand flat with palm facing inside',
+      '• Wiggle and move forward smoothly',
+      '• Mimics a swimming fish motion',
     ]
   },
   { 
     id: 3, 
     label: 'Rabbit', 
     emoji: '🐰', 
-    description: 'Extend and wiggle two fingers on head',
+    description: 'Cross arms and wiggle two fingers like rabbit ears',
     videoUri: require('../../../videos/rabbit.mp4'),
     tips: [
-      '• Hold two fingers extended above your head',
-      '• Wiggle them to mimic rabbit ears',
-      '• Keep fingers bent slightly',
+      '• Cross both arms at the wrists',
+      '• Wiggle two fingers on each crossed hand',
+      '• Mimic the motion of rabbit ears',
     ]
   },
 ];
@@ -62,9 +62,18 @@ type Phase = 'learn' | 'quiz' | 'complete';
 export default function AnimalLesson() {
   const { awardXp } = useAuth();
   const navigation = useNavigation();
-  const { animalsWatched, setAnimalsWatched, setAnimalsQuizIndex, setAnimalsQuizScore, setAnimalsQuizCompleted } = useLessonProgress();
+  const { animalsWatched, setAnimalsWatched, animalsQuizCompleted, setAnimalsQuizIndex, setAnimalsQuizScore, setAnimalsQuizCompleted } = useLessonProgress();
   const [phase, setPhase] = useState<Phase>('learn');
   const [activeVideo, setActiveVideo] = useState<Sign | null>(null);
+
+  // Reset quiz state if it was previously completed (for fresh retakes on re-entry)
+  React.useEffect(() => {
+    if (animalsQuizCompleted) {
+      setAnimalsQuizIndex(0);
+      setAnimalsQuizScore(0);
+      setAnimalsQuizCompleted(false);
+    }
+  }, []);
 
   const markWatched = async (id: number) => {
     if (animalsWatched[id]) return;

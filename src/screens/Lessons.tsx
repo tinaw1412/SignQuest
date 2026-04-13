@@ -60,7 +60,7 @@ function LessonCard({ title, progress, status, onPress }: {
 
 export default function Lessons() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { greetingsWatched, greetingsQuizIndex, greetingsQuizScore, greetingsQuizCompleted, animalsWatched, animalsQuizIndex, animalsQuizScore, animalsQuizCompleted } = useLessonProgress();
+  const { greetingsWatched, greetingsQuizIndex, greetingsQuizScore, greetingsQuizCompleted, animalsWatched, animalsQuizIndex, animalsQuizScore, animalsQuizCompleted, colorsWatched, colorsQuizIndex, colorsQuizScore, colorsQuizCompleted, feelingsWatched, feelingsQuizIndex, feelingsQuizScore, feelingsQuizCompleted } = useLessonProgress();
   const [refreshKey, setRefreshKey] = useState(0);
 
   // Refresh UI when lesson screen comes back to focus
@@ -89,10 +89,34 @@ export default function Lessons() {
   if (animalsQuizCompleted) {
     animalsProgress = 100;
   } else {
-    // 4 videos + 12 quiz questions = 16 total steps
+    // 4 videos + 8 quiz questions = 12 total steps
     const videosWatched = animalsWatched.filter(Boolean).length;
     const quizQuestionsAnswered = animalsQuizIndex + (animalsQuizScore > 0 ? 1 : 0);
-    animalsProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 16) * 100);
+    animalsProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 12) * 100);
+  }
+
+  // Calculate ColorLesson progress
+  let colorsProgress = 0;
+  
+  if (colorsQuizCompleted) {
+    colorsProgress = 100;
+  } else {
+    // 5 videos + 9 quiz questions = 14 total steps
+    const videosWatched = colorsWatched.filter(Boolean).length;
+    const quizQuestionsAnswered = colorsQuizIndex + (colorsQuizScore > 0 ? 1 : 0);
+    colorsProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 14) * 100);
+  }
+
+  // Calculate FeelingsLesson progress
+  let feelingsProgress = 0;
+  
+  if (feelingsQuizCompleted) {
+    feelingsProgress = 100;
+  } else {
+    // 4 videos + 8 quiz questions = 12 total steps
+    const videosWatched = feelingsWatched.filter(Boolean).length;
+    const quizQuestionsAnswered = feelingsQuizIndex + (feelingsQuizScore > 0 ? 1 : 0);
+    feelingsProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 12) * 100);
   }
 
     return (
@@ -114,14 +138,14 @@ export default function Lessons() {
                 status={greetingsQuizCompleted ? 'completed' : 'inprogress'} 
                 onPress={() => navigation.navigate('GreetingsLesson')} 
             />
-            <LessonCard title="Lesson 2: Colors" progress={0} status="inprogress" />
+            <LessonCard title="Lesson 2: Colors" progress={colorsProgress} status={colorsQuizCompleted ? 'completed' : 'inprogress'} onPress={() => navigation.navigate('ColorLesson')} />
             <LessonCard 
                 title="Lesson 3: Animals" 
                 progress={animalsProgress} 
                 status={animalsQuizCompleted ? 'completed' : 'inprogress'} 
                 onPress={() => navigation.navigate('AnimalLesson')} 
             />
-            <LessonCard title="Lesson 4: Feelings" progress={0} status="inprogress" />
+            <LessonCard title="Lesson 4: Feelings" progress={feelingsProgress} status={feelingsQuizCompleted ? 'completed' : 'inprogress'} onPress={() => navigation.navigate('FeelingsLesson')} />
 
             <View style={{ height: 120 }} />
         </ScrollView>

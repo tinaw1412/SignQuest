@@ -42,7 +42,7 @@ type Question = {
   explanation: string;
 };
 
-// ─── Questions ───────────────────────────────────────────────────────────────
+// ─── Questions (9 total: 3-3-3 distribution) ──────────────────────────────────
 const QUESTIONS: Question[] = [
   {
     id: 0,
@@ -53,14 +53,13 @@ const QUESTIONS: Question[] = [
       { label: 'Hello', correct: true },
       { label: 'See you later', correct: false },
       { label: 'Nice to meet you', correct: false },
-      { label: 'Thank you', correct: false },
     ],
     explanation: 'That open-hand wave means "Hello" — the most common ASL greeting.',
   },
   {
     id: 1,
     type: 'fill-in-blank',
-    prompt: 'Watch each sign and choose the one that completes the sentence.',
+    prompt: 'Watch each sign and complete the sentence.',
     sentence: '"___! My name is Alex."',
     options: [
       { videoKey: 'hello', correct: true },
@@ -71,6 +70,29 @@ const QUESTIONS: Question[] = [
   },
   {
     id: 2,
+    type: 'multi-video-pick',
+    prompt: 'Play each video. Which sign means "Hello"?',
+    options: [
+      { videoKey: 'hello', correct: true },
+      { videoKey: 'nicetomeetyou', correct: false },
+      { videoKey: 'seeyoulater', correct: false },
+    ],
+    explanation: '"Hello" is the standard greeting with an open-hand wave.',
+  },
+  {
+    id: 3,
+    type: 'video-to-definition',
+    prompt: 'What does this sign mean?',
+    videoKey: 'nicetomeetyou',
+    options: [
+      { label: 'Hello', correct: false },
+      { label: 'Nice to meet you', correct: true },
+      { label: 'See you later', correct: false },
+    ],
+    explanation: 'Both flat hands rotating at chest level = "Nice to meet you."',
+  },
+  {
+    id: 4,
     type: 'definition-to-video',
     prompt: 'Which video shows "Nice to meet you"?',
     options: [
@@ -78,10 +100,21 @@ const QUESTIONS: Question[] = [
       { videoKey: 'nicetomeetyou', correct: true },
       { videoKey: 'seeyoulater', correct: false },
     ],
-    explanation: 'Nice to meet you uses both flat hands rotating toward each other at chest height.',
+    explanation: 'Nice to meet you uses both flat hands rotating toward each other.',
   },
   {
-    id: 3,
+    id: 5,
+    type: 'scenario-video',
+    prompt: 'You\'re meeting someone for the first time. Which sign do you use after introductions?',
+    options: [
+      { videoKey: 'hello', correct: false },
+      { videoKey: 'nicetomeetyou', correct: true },
+      { videoKey: 'seeyoulater', correct: false },
+    ],
+    explanation: '"Nice to meet you" is the polite response after a first introduction.',
+  },
+  {
+    id: 6,
     type: 'video-to-definition',
     prompt: 'What does this sign mean?',
     videoKey: 'seeyoulater',
@@ -89,23 +122,11 @@ const QUESTIONS: Question[] = [
       { label: 'Hello', correct: false },
       { label: 'Nice to meet you', correct: false },
       { label: 'See you later', correct: true },
-      { label: 'Please', correct: false },
     ],
     explanation: 'The "L" handshape moving forward from the chin means "See you later."',
   },
   {
-    id: 4,
-    type: 'multi-video-pick',
-    prompt: 'Play each video. Which sign means "See you later"?',
-    options: [
-      { videoKey: 'hello', correct: false },
-      { videoKey: 'nicetomeetyou', correct: false },
-      { videoKey: 'seeyoulater', correct: true },
-    ],
-    explanation: 'See you later — the "L" handshape pushed forward from chin.',
-  },
-  {
-    id: 5,
+    id: 7,
     type: 'fill-in-blank',
     prompt: 'Watch each sign and complete the sentence.',
     sentence: '"It was great talking. ___!"',
@@ -117,97 +138,15 @@ const QUESTIONS: Question[] = [
     explanation: '"See you later!" is used at the end of a conversation.',
   },
   {
-    id: 6,
-    type: 'definition-to-video',
-    prompt: 'Which video shows "Hello"?',
-    options: [
-      { videoKey: 'nicetomeetyou', correct: false },
-      { videoKey: 'seeyoulater', correct: false },
-      { videoKey: 'hello', correct: true },
-    ],
-    explanation: 'Hello — a smooth open-hand wave, palm facing outward.',
-  },
-  {
-    id: 7,
-    type: 'video-to-definition',
-    prompt: 'What does this sign mean?',
-    videoKey: 'nicetomeetyou',
-    options: [
-      { label: 'Goodbye', correct: false },
-      { label: 'Hello', correct: false },
-      { label: 'See you later', correct: false },
-      { label: 'Nice to meet you', correct: true },
-    ],
-    explanation: 'Both flat hands rotating at chest level = "Nice to meet you."',
-  },
-  {
     id: 8,
-    type: 'scenario-video',
-    prompt: 'You\'re meeting your friend\'s parent for the first time. Which sign do you use after introductions?',
+    type: 'multi-video-pick',
+    prompt: 'Play each video. Which sign means "See you later"?',
     options: [
       { videoKey: 'hello', correct: false },
-      { videoKey: 'nicetomeetyou', correct: true },
-      { videoKey: 'seeyoulater', correct: false },
-    ],
-    explanation: '"Nice to meet you" is the polite response after a first introduction.',
-  },
-  {
-    id: 9,
-    type: 'multi-video-pick',
-    prompt: 'Play each video. Which sign do you use to greet a friend in the morning?',
-    options: [
-      { videoKey: 'hello', correct: true },
-      { videoKey: 'nicetomeetyou', correct: false },
-      { videoKey: 'seeyoulater', correct: false },
-    ],
-    explanation: '"Hello" is the standard greeting to use anytime when saying hi to someone.',
-  },
-  {
-    id: 10,
-    type: 'fill-in-blank',
-    prompt: 'Watch each sign and complete the phrase.',
-    sentence: '"___ again! I missed you."',
-    options: [
-      { videoKey: 'nicetomeetyou', correct: false },
-      { videoKey: 'hello', correct: true },
-      { videoKey: 'seeyoulater', correct: false },
-    ],
-    explanation: '"Hello" works great when you\'re greeting someone again after time apart.',
-  },
-  {
-    id: 11,
-    type: 'definition-to-video',
-    prompt: 'Which video shows the sign for a casual parting with a specific hand shape?',
-    options: [
       { videoKey: 'nicetomeetyou', correct: false },
       { videoKey: 'seeyoulater', correct: true },
-      { videoKey: 'hello', correct: false },
     ],
-    explanation: '"See you later" uses an "L" handshape, which is very distinctive in ASL.',
-  },
-  {
-    id: 12,
-    type: 'scenario-video',
-    prompt: 'You\'re in a formal business meeting introducing yourself to colleagues. Which greeting is most appropriate?',
-    options: [
-      { videoKey: 'nicetomeetyou', correct: true },
-      { videoKey: 'hello', correct: false },
-      { videoKey: 'seeyoulater', correct: false },
-    ],
-    explanation: '"Nice to meet you" is the most professional and respectful greeting for formal introductions.',
-  },
-  {
-    id: 13,
-    type: 'video-to-definition',
-    prompt: 'What does this sign mean?',
-    videoKey: 'nicetomeetyou',
-    options: [
-      { label: 'Goodbye', correct: false },
-      { label: 'Hello', correct: false },
-      { label: 'See you later', correct: false },
-      { label: 'Nice to meet you', correct: true },
-    ],
-    explanation: 'Both flat hands rotating at chest level = "Nice to meet you."',
+    explanation: '"See you later" uses an "L" handshape, distinctive in ASL.',
   },
 ];
 

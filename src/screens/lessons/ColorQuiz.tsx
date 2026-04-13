@@ -4,16 +4,16 @@ import {
   SafeAreaView, ScrollView
 } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { useAuth } from '../../context/AuthContext';
 import { useLessonProgress } from '../../context/LessonProgressContext';
 import { useNavigation } from '@react-navigation/native';
 
 // ─── Video assets ────────────────────────────────────────────────────────────
 const VIDEOS = {
-  cat: require('../../../videos/cat.mp4'),
-  dog: require('../../../videos/dog.mp4'),
-  fish: require('../../../videos/fish.mp4'),
-  rabbit: require('../../../videos/rabbit.mp4'),
+  red: require('../../../videos/red.mp4'),
+  blue: require('../../../videos/blue.mp4'),
+  yellow: require('../../../videos/yellow.mp4'),
+  white: require('../../../videos/white.mp4'),
+  black: require('../../../videos/black.mp4'),
 };
 
 type VideoKey = keyof typeof VIDEOS;
@@ -33,90 +33,102 @@ type Question = {
   explanation: string;
 };
 
-// ─── Questions ───────────────────────────────────────────────────────────────
+// ─── Questions (9 total: 2-2-2-2-1 distribution across 5 colors) ────────────
 const QUESTIONS: Question[] = [
   {
     id: 0,
-    prompt: 'Which animal does this sign represent?',
-    videoKey: 'cat',
+    prompt: 'Which color does this sign represent?',
+    videoKey: 'red',
     options: [
-      { label: 'Cat', correct: true },
-      { label: 'Dog', correct: false },
-      { label: 'Fish', correct: false },
+      { label: 'Red', correct: true },
+      { label: 'Blue', correct: false },
+      { label: 'Yellow', correct: false },
     ],
-    explanation: 'This sign shows a cat with fingers near the mouth moving backward.',
+    explanation: 'This sign shows red by swiping down on the lip area.',
   },
   {
     id: 1,
-    prompt: 'Which video shows the sign for "cat"?',
+    prompt: 'Which video shows the sign for "blue"?',
     options: [
-      { videoKey: 'cat', correct: true },
-      { videoKey: 'dog', correct: false },
-      { videoKey: 'fish', correct: false },
+      { videoKey: 'red', correct: false },
+      { videoKey: 'blue', correct: true },
+      { videoKey: 'yellow', correct: false },
     ],
-    explanation: 'Cat is signed with a "C" handshape near the mouth.',
+    explanation: 'Blue is signed by twisting the hand with "B" handshape.',
   },
   {
     id: 2,
-    prompt: 'Which video shows the sign for "dog"?',
+    prompt: 'Which color does this sign represent?',
+    videoKey: 'yellow',
     options: [
-      { videoKey: 'dog', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'rabbit', correct: false },
+      { label: 'Yellow', correct: true },
+      { label: 'White', correct: false },
+      { label: 'Red', correct: false },
     ],
-    explanation: 'Dog is signed by patting your leg and snapping your fingers.',
+    explanation: 'Yellow is signed by twisting the hand with "Y" handshape.',
   },
   {
     id: 3,
-    prompt: 'Complete the phrase: "The ___ barked loudly."',
-    sentence: '"The ___ barked loudly."',
+    prompt: 'Which video shows the sign for "white"?',
     options: [
-      { videoKey: 'dog', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'fish', correct: false },
+      { videoKey: 'white', correct: true },
+      { videoKey: 'black', correct: false },
+      { videoKey: 'blue', correct: false },
     ],
-    explanation: 'Dogs bark, making this the correct animal.',
+    explanation: 'White is signed by pulling the hand down with fingers spread.',
   },
   {
     id: 4,
-    prompt: 'Which animal does this sign represent?',
-    videoKey: 'fish',
+    prompt: 'Complete: "The sky is ___"',
+    sentence: '"The sky is ___"',
     options: [
-      { label: 'Fish', correct: true },
-      { label: 'Cat', correct: false },
-      { label: 'Rabbit', correct: false },
+      { videoKey: 'red', correct: false },
+      { videoKey: 'blue', correct: true },
+      { videoKey: 'yellow', correct: false },
     ],
-    explanation: 'Fish is signed with an open hand moving forward while closing fingers.',
+    explanation: 'The sky is typically blue.',
   },
   {
     id: 5,
-    prompt: 'Which animal would you find in water?',
+    prompt: 'Which color does this sign represent?',
+    videoKey: 'black',
     options: [
-      { videoKey: 'fish', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'dog', correct: false },
+      { label: 'Black', correct: true },
+      { label: 'White', correct: false },
+      { label: 'Yellow', correct: false },
     ],
-    explanation: 'Fish live in water.',
+    explanation: 'Black is signed by drawing the hand across the forehead.',
   },
   {
     id: 6,
-    prompt: 'Which video shows the sign for "rabbit"?',
+    prompt: 'Which video shows the sign for "red"?',
     options: [
-      { videoKey: 'rabbit', correct: true },
-      { videoKey: 'dog', correct: false },
-      { videoKey: 'fish', correct: false },
+      { videoKey: 'red', correct: true },
+      { videoKey: 'white', correct: false },
+      { videoKey: 'black', correct: false },
     ],
-    explanation: 'Rabbit is signed with two fingers wiggling above your head like ears.',
+    explanation: 'Red is often signed by drawing down from the lip.',
   },
   {
     id: 7,
-    prompt: 'Which animal has long ears?',
+    prompt: 'Complete: "Snow is ___"',
+    sentence: '"Snow is ___"',
     options: [
-      { videoKey: 'rabbit', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'dog', correct: false },
+      { videoKey: 'black', correct: false },
+      { videoKey: 'white', correct: true },
+      { videoKey: 'blue', correct: false },
     ],
-    explanation: 'Rabbits are known for their long ears.',
+    explanation: 'Snow is white.',
+  },
+  {
+    id: 8,
+    prompt: 'Which video shows the sign for "yellow"?',
+    options: [
+      { videoKey: 'yellow', correct: true },
+      { videoKey: 'red', correct: false },
+      { videoKey: 'white', correct: false },
+    ],
+    explanation: 'Yellow is signed with a "Y" handshape twist motion.',
   },
 ];
 
@@ -155,7 +167,7 @@ function VideoTile({
   };
 
   const height = size === 'large' ? 200 : size === 'small' ? 100 : 140;
-  const animalName = videoKey.charAt(0).toUpperCase() + videoKey.slice(1);
+  const colorName = videoKey.charAt(0).toUpperCase() + videoKey.slice(1);
 
   let borderColor = '#3a3d6e';
   if (correct) borderColor = '#3fc98e';
@@ -247,14 +259,14 @@ interface Props {
   onBack?: () => void;
 }
 
-export default function AnimalQuiz({ onComplete, onBack }: Props) {
+export default function ColorQuiz({ onComplete, onBack }: Props) {
   const navigation = useNavigation();
-  const { animalsQuizIndex, setAnimalsQuizIndex, animalsQuizScore, setAnimalsQuizScore, setAnimalsQuizCompleted } = useLessonProgress();
+  const { colorsQuizIndex, setColorsQuizIndex, colorsQuizScore, setColorsQuizScore, setColorsQuizCompleted } = useLessonProgress();
   const [selected, setSelected] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  const qIndex = animalsQuizIndex;
-  const score = animalsQuizScore;
+  const qIndex = colorsQuizIndex;
+  const score = colorsQuizScore;
 
   const q = QUESTIONS[qIndex];
   const isCorrect = selected !== null && q.options[selected].correct;
@@ -263,15 +275,15 @@ export default function AnimalQuiz({ onComplete, onBack }: Props) {
     if (showFeedback) return;
     setSelected(i);
     setShowFeedback(true);
-    if (q.options[i].correct) setAnimalsQuizScore(score + 1);
+    if (q.options[i].correct) setColorsQuizScore(score + 1);
   };
 
   const handleNext = () => {
     if (qIndex + 1 >= QUESTIONS.length) {
-      setAnimalsQuizCompleted(true);
+      setColorsQuizCompleted(true);
       onComplete(score);
     } else {
-      setAnimalsQuizIndex(qIndex + 1);
+      setColorsQuizIndex(qIndex + 1);
       setSelected(null);
       setShowFeedback(false);
     }

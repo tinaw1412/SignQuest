@@ -4,16 +4,15 @@ import {
   SafeAreaView, ScrollView
 } from 'react-native';
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { useAuth } from '../../context/AuthContext';
 import { useLessonProgress } from '../../context/LessonProgressContext';
 import { useNavigation } from '@react-navigation/native';
 
 // ─── Video assets ────────────────────────────────────────────────────────────
 const VIDEOS = {
-  cat: require('../../../videos/cat.mp4'),
-  dog: require('../../../videos/dog.mp4'),
-  fish: require('../../../videos/fish.mp4'),
-  rabbit: require('../../../videos/rabbit.mp4'),
+  happy: require('../../../videos/happy.mp4'),
+  sad: require('../../../videos/sad.mp4'),
+  angry: require('../../../videos/angry.mp4'),
+  excited: require('../../../videos/excited.mp4'),
 };
 
 type VideoKey = keyof typeof VIDEOS;
@@ -33,90 +32,92 @@ type Question = {
   explanation: string;
 };
 
-// ─── Questions ───────────────────────────────────────────────────────────────
+// ─── Questions (8 total: 2-2-2-2 distribution across 4 feelings) ─────────────
 const QUESTIONS: Question[] = [
   {
     id: 0,
-    prompt: 'Which animal does this sign represent?',
-    videoKey: 'cat',
+    prompt: 'Which feeling does this sign represent?',
+    videoKey: 'happy',
     options: [
-      { label: 'Cat', correct: true },
-      { label: 'Dog', correct: false },
-      { label: 'Fish', correct: false },
+      { label: 'Happy', correct: true },
+      { label: 'Sad', correct: false },
+      { label: 'Excited', correct: false },
     ],
-    explanation: 'This sign shows a cat with fingers near the mouth moving backward.',
+    explanation: 'Happy is signed by moving both hands upward on the chest with a smile.',
   },
   {
     id: 1,
-    prompt: 'Which video shows the sign for "cat"?',
+    prompt: 'Which video shows the sign for "sad"?',
     options: [
-      { videoKey: 'cat', correct: true },
-      { videoKey: 'dog', correct: false },
-      { videoKey: 'fish', correct: false },
+      { videoKey: 'sad', correct: true },
+      { videoKey: 'happy', correct: false },
+      { videoKey: 'excited', correct: false },
     ],
-    explanation: 'Cat is signed with a "C" handshape near the mouth.',
+    explanation: 'Sad is signed by moving hands downward on the face with a frown.',
   },
   {
     id: 2,
-    prompt: 'Which video shows the sign for "dog"?',
+    prompt: 'Which feeling does this sign represent?',
+    videoKey: 'angry',
     options: [
-      { videoKey: 'dog', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'rabbit', correct: false },
+      { label: 'Angry', correct: true },
+      { label: 'Happy', correct: false },
+      { label: 'Sad', correct: false },
     ],
-    explanation: 'Dog is signed by patting your leg and snapping your fingers.',
+    explanation: 'Angry is signed by a fierce expression with hands showing tension.',
   },
   {
     id: 3,
-    prompt: 'Complete the phrase: "The ___ barked loudly."',
-    sentence: '"The ___ barked loudly."',
+    prompt: 'Which video shows the sign for "excited"?',
     options: [
-      { videoKey: 'dog', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'fish', correct: false },
+      { videoKey: 'excited', correct: true },
+      { videoKey: 'angry', correct: false },
+      { videoKey: 'sad', correct: false },
     ],
-    explanation: 'Dogs bark, making this the correct animal.',
+    explanation: 'Excited is signed with energetic upward hand movements and a happy expression.',
   },
   {
     id: 4,
-    prompt: 'Which animal does this sign represent?',
-    videoKey: 'fish',
+    prompt: 'Complete: "I am very ___"',
+    sentence: '"I am very ___"',
     options: [
-      { label: 'Fish', correct: true },
-      { label: 'Cat', correct: false },
-      { label: 'Rabbit', correct: false },
+      { videoKey: 'happy', correct: true },
+      { videoKey: 'angry', correct: false },
+      { videoKey: 'sad', correct: false },
     ],
-    explanation: 'Fish is signed with an open hand moving forward while closing fingers.',
+    explanation: 'Being very happy is a positive emotion you might commonly express.',
   },
   {
     id: 5,
-    prompt: 'Which animal would you find in water?',
+    prompt: 'Which feeling does this sign represent?',
+    videoKey: 'sad',
     options: [
-      { videoKey: 'fish', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'dog', correct: false },
+      { label: 'Sad', correct: true },
+      { label: 'Excited', correct: false },
+      { label: 'Angry', correct: false },
     ],
-    explanation: 'Fish live in water.',
+    explanation: 'Sad is shown through downward hand movements and a sad facial expression.',
   },
   {
     id: 6,
-    prompt: 'Which video shows the sign for "rabbit"?',
+    prompt: 'Which video shows the sign for "angry"?',
     options: [
-      { videoKey: 'rabbit', correct: true },
-      { videoKey: 'dog', correct: false },
-      { videoKey: 'fish', correct: false },
+      { videoKey: 'angry', correct: true },
+      { videoKey: 'happy', correct: false },
+      { videoKey: 'excited', correct: false },
     ],
-    explanation: 'Rabbit is signed with two fingers wiggling above your head like ears.',
+    explanation: 'Angry is signed with strong, tense hand movements and an angry expression.',
   },
   {
     id: 7,
-    prompt: 'Which animal has long ears?',
+    prompt: 'Complete: "I am ___ about the game!"',
+    sentence: '"I am ___ about the game!"',
     options: [
-      { videoKey: 'rabbit', correct: true },
-      { videoKey: 'cat', correct: false },
-      { videoKey: 'dog', correct: false },
+      { videoKey: 'excited', correct: true },
+      { videoKey: 'sad', correct: false },
+      { videoKey: 'angry', correct: false },
     ],
-    explanation: 'Rabbits are known for their long ears.',
+    explanation: 'Being excited about a game shows enthusiasm and joy.',
   },
 ];
 
@@ -155,7 +156,7 @@ function VideoTile({
   };
 
   const height = size === 'large' ? 200 : size === 'small' ? 100 : 140;
-  const animalName = videoKey.charAt(0).toUpperCase() + videoKey.slice(1);
+  const feelingName = videoKey.charAt(0).toUpperCase() + videoKey.slice(1);
 
   let borderColor = '#3a3d6e';
   if (correct) borderColor = '#3fc98e';
@@ -247,14 +248,14 @@ interface Props {
   onBack?: () => void;
 }
 
-export default function AnimalQuiz({ onComplete, onBack }: Props) {
+export default function FeelingsQuiz({ onComplete, onBack }: Props) {
   const navigation = useNavigation();
-  const { animalsQuizIndex, setAnimalsQuizIndex, animalsQuizScore, setAnimalsQuizScore, setAnimalsQuizCompleted } = useLessonProgress();
+  const { feelingsQuizIndex, setFeelingsQuizIndex, feelingsQuizScore, setFeelingsQuizScore, setFeelingsQuizCompleted } = useLessonProgress();
   const [selected, setSelected] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  const qIndex = animalsQuizIndex;
-  const score = animalsQuizScore;
+  const qIndex = feelingsQuizIndex;
+  const score = feelingsQuizScore;
 
   const q = QUESTIONS[qIndex];
   const isCorrect = selected !== null && q.options[selected].correct;
@@ -263,15 +264,15 @@ export default function AnimalQuiz({ onComplete, onBack }: Props) {
     if (showFeedback) return;
     setSelected(i);
     setShowFeedback(true);
-    if (q.options[i].correct) setAnimalsQuizScore(score + 1);
+    if (q.options[i].correct) setFeelingsQuizScore(score + 1);
   };
 
   const handleNext = () => {
     if (qIndex + 1 >= QUESTIONS.length) {
-      setAnimalsQuizCompleted(true);
+      setFeelingsQuizCompleted(true);
       onComplete(score);
     } else {
-      setAnimalsQuizIndex(qIndex + 1);
+      setFeelingsQuizIndex(qIndex + 1);
       setSelected(null);
       setShowFeedback(false);
     }

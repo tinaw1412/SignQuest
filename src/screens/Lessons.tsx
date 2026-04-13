@@ -1,6 +1,16 @@
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useLessonProgress } from '../context/LessonProgressContext';
+import GreetingsLesson from './lessons/GreetingsLesson';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../App';
+import { useState } from 'react';
 
+type LearnStackParamList = {
+  LessonsList: undefined;
+  GreetingsLesson: undefined;
+};
 function SmallChip({ children }: { children: React.ReactNode }) {
     return (
         <View style={styles.chip}>
@@ -9,12 +19,26 @@ function SmallChip({ children }: { children: React.ReactNode }) {
     );
 }
 
-function LessonCard({ title, progress, status }: { title: string; progress?: number; status: 'completed' | 'inprogress' | 'locked' }) {
+function LessonCard({ title, progress, status, onPress }: { 
+    title: string; 
+    progress?: number; 
+    status: 'completed' | 'inprogress' | 'locked';
+    onPress?: () => void; 
+}) {
     return (
-        <View style={styles.lessonCard}>
+        <TouchableOpacity 
+            style={styles.lessonCard} 
+            onPress={onPress} 
+            disabled={status === 'locked'} 
+            activeOpacity={0.7}
+        >
             <View style={styles.lessonHeader}>
                 <Text style={styles.lessonTitle}>{title}</Text>
-                {status === 'inprogress' && <View style={styles.continuePill}><Text style={styles.continueText}>Continue</Text></View>}
+                {status === 'inprogress' && (
+                    <View style={styles.continuePill}>
+                        <Text style={styles.continueText}>Continue</Text>
+                    </View>
+                )}
             </View>
 
             {status === 'locked' ? (
@@ -25,16 +49,78 @@ function LessonCard({ title, progress, status }: { title: string; progress?: num
                         <View style={[styles.progressFill, { flex: progress ?? 0 }]} />
                         <View style={[styles.progressEmpty, { flex: 100 - (progress ?? 0) }]} />
                     </View>
-                    <Text style={styles.lessonStatus}>{status === 'completed' ? 'Completed' : 'In Progress'}</Text>
+                    <Text style={styles.lessonStatus}>
+                        {status === 'completed' ? 'Completed' : 'In Progress'}
+                    </Text>
                 </View>
             )}
-        </View>
+        </TouchableOpacity>
     );
 }
 
 export default function Lessons() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { greetingsWatched, greetingsQuizIndex, greetingsQuizScore, greetingsQuizCompleted, animalsWatched, animalsQuizIndex, animalsQuizScore, animalsQuizCompleted, colorsWatched, colorsQuizIndex, colorsQuizScore, colorsQuizCompleted, feelingsWatched, feelingsQuizIndex, feelingsQuizScore, feelingsQuizCompleted } = useLessonProgress();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Refresh UI when lesson screen comes back to focus
+  useFocusEffect(
+    React.useCallback(() => {
+      setRefreshKey(k => k + 1);
+    }, [])
+  );
+
+  // Calculate GreetingsLesson progress
+  // If quiz is completed, show 100%, otherwise calculate based on videos + quiz progress
+  let totalProgress = 0;
+  
+  if (greetingsQuizCompleted) {
+    totalProgress = 100;
+  } else {
+    // 3 videos + 14 quiz questions = 17 total steps
+    const videosWatched = greetingsWatched.filter(Boolean).length;
+    const quizQuestionsAnswered = greetingsQuizIndex + (greetingsQuizScore > 0 ? 1 : 0);
+    totalProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 17) * 100);
+  }
+
+  // Calculate AnimalLesson progress
+  let animalsProgress = 0;
+  
+  if (animalsQuizCompleted) {
+    animalsProgress = 100;
+  } else {
+    // 4 videos + 8 quiz questions = 12 total steps
+    const videosWatched = animalsWatched.filter(Boolean).length;
+    const quizQuestionsAnswered = animalsQuizIndex + (animalsQuizScore > 0 ? 1 : 0);
+    animalsProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 12) * 100);
+  }
+
+  // Calculate ColorLesson progress
+  let colorsProgress = 0;
+  
+  if (colorsQuizCompleted) {
+    colorsProgress = 100;
+  } else {
+    // 5 videos + 9 quiz questions = 14 total steps
+    const videosWatched = colorsWatched.filter(Boolean).length;
+    const quizQuestionsAnswered = colorsQuizIndex + (colorsQuizScore > 0 ? 1 : 0);
+    colorsProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 14) * 100);
+  }
+
+  // Calculate FeelingsLesson progress
+  let feelingsProgress = 0;
+  
+  if (feelingsQuizCompleted) {
+    feelingsProgress = 100;
+  } else {
+    // 4 videos + 8 quiz questions = 12 total steps
+    const videosWatched = feelingsWatched.filter(Boolean).length;
+    const quizQuestionsAnswered = feelingsQuizIndex + (feelingsQuizScore > 0 ? 1 : 0);
+    feelingsProgress = Math.round(((videosWatched + quizQuestionsAnswered) / 12) * 100);
+  }
+
     return (
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScrollView key={refreshKey} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
             <View style={styles.headerRow}>
                 <Text style={styles.screenTitle}>Lessons</Text>
             </View>
@@ -46,9 +132,20 @@ export default function Lessons() {
                 <SmallChip>Phrases</SmallChip>
             </View>
 
-            <LessonCard title="Lesson 1: Alphabet" progress={100} status="completed" />
-            <LessonCard title="Lesson 2: Greetings" progress={50} status="inprogress" />
-            <LessonCard title="Lesson 3: Introductions" status="locked" />
+            <LessonCard 
+                title="Lesson 1: Greetings" 
+                progress={totalProgress} 
+                status={greetingsQuizCompleted ? 'completed' : 'inprogress'} 
+                onPress={() => navigation.navigate('GreetingsLesson')} 
+            />
+            <LessonCard title="Lesson 2: Colors" progress={colorsProgress} status={colorsQuizCompleted ? 'completed' : 'inprogress'} onPress={() => navigation.navigate('ColorLesson')} />
+            <LessonCard 
+                title="Lesson 3: Animals" 
+                progress={animalsProgress} 
+                status={animalsQuizCompleted ? 'completed' : 'inprogress'} 
+                onPress={() => navigation.navigate('AnimalLesson')} 
+            />
+            <LessonCard title="Lesson 4: Feelings" progress={feelingsProgress} status={feelingsQuizCompleted ? 'completed' : 'inprogress'} onPress={() => navigation.navigate('FeelingsLesson')} />
 
             <View style={{ height: 120 }} />
         </ScrollView>

@@ -1,81 +1,101 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Platform } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import BottomNav from './src/components/BottomNav';
 import Dashboard from './src/screens/Dashboard';
-import Lessons from './src/screens/Lessons';
 import Daily from './src/screens/Daily';
+import DailyQuiz from './src/screens/DailyQuiz';
 import Leaderboard from './src/screens/Leaderboard';
 import Profile from './src/screens/Profile';
+import GreetingsLesson from './src/screens/lessons/GreetingsLesson';
+import AnimalLesson from './src/screens/lessons/AnimalLesson';
+import ColorLesson from './src/screens/lessons/ColorLesson';
+import FeelingsLesson from './src/screens/lessons/FeelingsLesson';
+import Lessons from './src/screens/Lessons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { LessonProgressProvider } from './src/context/LessonProgressContext';
 import Auth from './src/screens/Auth';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+export type RootStackParamList = {
+  MainTabs: undefined;
+  GreetingsLesson: undefined;
+  AnimalLesson: undefined;
+  ColorLesson: undefined;
+  FeelingsLesson: undefined;
+  DailyQuiz: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 type TabKey = 'Home' | 'Learn' | 'Daily' | 'Rank' | 'Profile';
 
-function AuthGate() {
-  const { user, loading } = useAuth();
+// This is the main tab layout — no navigator nesting needed
+function MainTabs() {
   const [active, setActive] = useState<TabKey>('Home');
 
-  if (loading) return null;
-  if (!user) return <Auth />;
+  const renderScreen = () => {
+    switch (active) {
+      case 'Home': return <Dashboard />;
+      case 'Learn': return <Lessons />;
+      case 'Daily': return <Daily />;
+      case 'Rank': return <Leaderboard />;
+      case 'Profile': return <Profile />;
+    }
+  };
 
   return (
     <View style={styles.safe}>
       <View style={styles.container}>
         <View style={styles.content}>
-          {active === 'Home' ? (
-            <Dashboard />
-          ) : active === 'Learn' ? (
-            <Lessons />
-          ) : active === 'Daily' ? (
-            <Daily />
-          ) : active === 'Rank' ? (
-            <Leaderboard />
-          ) : active === 'Profile' ? (
-            <Profile />
-          ) : (
-            <>
-              <Text style={styles.title}>SignQuest</Text>
-              <Text style={styles.subtitle}>Current tab: {active}</Text>
-
-              <View style={styles.card}>
-                <Text style={styles.cardTitle}>{active} Screen</Text>
-                <Text style={styles.cardBody}>This is a placeholder for the {active} screen.</Text>
-              </View>
-            </>
-          )}
+          {renderScreen()}
         </View>
-
-        <BottomNav active={active} onTabPress={(t) => setActive(t)} />
+        <BottomNav active={active} onTabPress={setActive} />
         <StatusBar style="light" />
       </View>
     </View>
   );
 }
 
+function AppNavigator() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MainTabs" component={MainTabs} />
+      <Stack.Screen name="GreetingsLesson" component={GreetingsLesson} />
+      <Stack.Screen name="AnimalLesson" component={AnimalLesson} />
+      <Stack.Screen name="ColorLesson" component={ColorLesson} />
+      <Stack.Screen name="FeelingsLesson" component={FeelingsLesson} />
+      <Stack.Screen name="DailyQuiz" component={DailyQuiz} />
+    </Stack.Navigator>
+  );
+}
+
+function AuthGate() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Auth />;
+  return <AppNavigator />;
+}
+
 export default function App() {
   return (
-    <AuthProvider>
-      <AuthGate>
-        {/* children not used in gate, kept for structure */}
-      </AuthGate>
-    </AuthProvider>
+    <NavigationContainer>
+      <AuthProvider>
+        <LessonProgressProvider>
+          <AuthGate />
+        </LessonProgressProvider>
+      </AuthProvider>
+    </NavigationContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  // Add extra top padding so content is visually separated from the device status area
-  safe: { flex: 1, backgroundColor: '#23254b', paddingTop: Platform.OS === 'android' ? 24 : 44 },
-  container: { flex: 1, backgroundColor: '#23254b' },
-  content: { flex: 1, padding: 20, paddingBottom: 92 },
-  title: { color: '#fff', fontSize: 28, fontWeight: '700', marginTop: 8 },
-  subtitle: { color: '#cbd5ff', fontSize: 14, marginTop: 6 },
-  card: {
-    marginTop: 20,
-    backgroundColor: '#e6e6ee',
-    borderRadius: 12,
-    padding: 16,
+  safe: {
+    flex: 1,
+    backgroundColor: '#23254b',
+    paddingTop: Platform.OS === 'android' ? 24 : 44,
   },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: '#111' },
-  cardBody: { marginTop: 8, color: '#333' },
+  container: { flex: 1, backgroundColor: '#23254b' },
+  content: { flex: 1, paddingBottom: 72 },
 });

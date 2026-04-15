@@ -8,14 +8,12 @@ import { useAuth } from '../../context/AuthContext';
 import { useLessonProgress } from '../../context/LessonProgressContext';
 import { useNavigation } from '@react-navigation/native';
 
-// ─── Video assets ────────────────────────────────────────────────────────────
 const VIDEOS = {
   hello: require('../../../videos/hello.mp4'),
   nicetomeetyou: require('../../../videos/nicetomeetyou.mp4'),
   seeyoulater: require('../../../videos/seeyoulater.mp4'),
 };
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 type QuestionType =
   | 'video-to-definition'   // watch video → pick correct meaning
   | 'definition-to-video'   // read definition → pick correct video
@@ -36,13 +34,12 @@ type Question = {
   id: number;
   type: QuestionType;
   prompt: string;
-  sentence?: string;       // for fill-in-blank
-  videoKey?: VideoKey;     // the question video (for video-to-definition, match-sign)
+  sentence?: string;       
+  videoKey?: VideoKey;     
   options: Option[];
   explanation: string;
 };
 
-// ─── Questions (9 total: 3-3-3 distribution) ──────────────────────────────────
 const QUESTIONS: Question[] = [
   {
     id: 0,
@@ -150,7 +147,6 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-// ─── Single video player tile ─────────────────────────────────────────────────
 function VideoTile({
   videoKey,
   selected,
@@ -242,7 +238,6 @@ function VideoTile({
   );
 }
 
-// ─── Single question video (large, for video-to-definition) ──────────────────
 function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   const player = useVideoPlayer(VIDEOS[videoKey], (p) => {
     p.loop = true;
@@ -273,7 +268,6 @@ function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   );
 }
 
-// ─── Main Quiz ────────────────────────────────────────────────────────────────
 interface Props {
   onComplete: (score: number) => void;
   onBack?: () => void;
@@ -457,7 +451,6 @@ export default function GreetingsQuiz({ onComplete, onBack }: Props) {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#23254b' },
   topBar: {

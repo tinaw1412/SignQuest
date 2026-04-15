@@ -7,7 +7,6 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { useLessonProgress } from '../../context/LessonProgressContext';
 import { useNavigation } from '@react-navigation/native';
 
-// ─── Video assets ────────────────────────────────────────────────────────────
 const VIDEOS = {
   happy: require('../../../videos/happy.mp4'),
   sad: require('../../../videos/sad.mp4'),
@@ -32,7 +31,6 @@ type Question = {
   explanation: string;
 };
 
-// ─── Questions (8 total: 2-2-2-2 distribution across 4 feelings) ─────────────
 const QUESTIONS: Question[] = [
   {
     id: 0,
@@ -121,7 +119,6 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-// ─── Single video player tile ─────────────────────────────────────────────────
 function VideoTile({
   videoKey,
   selected,
@@ -211,7 +208,6 @@ function VideoTile({
   );
 }
 
-// ─── Single question video (large, for video-to-definition) ──────────────────
 function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   const player = useVideoPlayer(VIDEOS[videoKey], (p) => {
     p.loop = true;
@@ -242,7 +238,6 @@ function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   );
 }
 
-// ─── Main Quiz ────────────────────────────────────────────────────────────────
 interface Props {
   onComplete: (score: number) => void;
   onBack?: () => void;

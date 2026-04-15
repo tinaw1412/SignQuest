@@ -7,7 +7,6 @@ import { VideoView, useVideoPlayer } from 'expo-video';
 import { useLessonProgress } from '../../context/LessonProgressContext';
 import { useNavigation } from '@react-navigation/native';
 
-// ─── Video assets ────────────────────────────────────────────────────────────
 const VIDEOS = {
   red: require('../../../videos/red.mp4'),
   blue: require('../../../videos/blue.mp4'),
@@ -33,7 +32,6 @@ type Question = {
   explanation: string;
 };
 
-// ─── Questions (9 total: 2-2-2-2-1 distribution across 5 colors) ────────────
 const QUESTIONS: Question[] = [
   {
     id: 0,
@@ -132,7 +130,6 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-// ─── Single video player tile ─────────────────────────────────────────────────
 function VideoTile({
   videoKey,
   selected,
@@ -222,7 +219,6 @@ function VideoTile({
   );
 }
 
-// ─── Single question video (large, for video-to-definition) ──────────────────
 function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   const player = useVideoPlayer(VIDEOS[videoKey], (p) => {
     p.loop = true;

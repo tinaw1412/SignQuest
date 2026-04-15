@@ -8,7 +8,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useLessonProgress } from '../../context/LessonProgressContext';
 import { useNavigation } from '@react-navigation/native';
 
-// ─── Video assets ────────────────────────────────────────────────────────────
 const VIDEOS = {
   cat: require('../../../videos/cat.mp4'),
   dog: require('../../../videos/dog.mp4'),
@@ -33,7 +32,6 @@ type Question = {
   explanation: string;
 };
 
-// ─── Questions ───────────────────────────────────────────────────────────────
 const QUESTIONS: Question[] = [
   {
     id: 0,
@@ -120,7 +118,6 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-// ─── Single video player tile ─────────────────────────────────────────────────
 function VideoTile({
   videoKey,
   selected,
@@ -210,7 +207,6 @@ function VideoTile({
   );
 }
 
-// ─── Single question video (large, for video-to-definition) ──────────────────
 function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   const player = useVideoPlayer(VIDEOS[videoKey], (p) => {
     p.loop = true;
@@ -241,7 +237,6 @@ function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   );
 }
 
-// ─── Main Quiz ────────────────────────────────────────────────────────────────
 interface Props {
   onComplete: (score: number) => void;
   onBack?: () => void;

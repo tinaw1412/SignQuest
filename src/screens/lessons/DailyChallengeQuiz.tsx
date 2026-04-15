@@ -8,7 +8,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useLessonProgress } from '../../context/LessonProgressContext';
 import { useNavigation } from '@react-navigation/native';
 
-// ─── Video assets ────────────────────────────────────────────────────────────
 const VIDEOS = {
   // Greetings
   hello: require('../../../videos/hello.mp4'),
@@ -32,7 +31,6 @@ const VIDEOS = {
   excited: require('../../../videos/excited.mp4'),
 };
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 type QuestionType =
   | 'video-to-definition'
   | 'definition-to-video'
@@ -60,9 +58,8 @@ type Question = {
   lesson?: string;
 };
 
-// ─── All questions from all lessons ───────────────────────────────────────────
 const ALL_QUESTIONS: Question[] = [
-  // ──── GREETINGS (9 questions)
+  // GREETINGS (9 questions)
   {
     id: 0,
     lesson: 'greetings',
@@ -279,7 +276,7 @@ const ALL_QUESTIONS: Question[] = [
     explanation: '"Rabbit" mimics the distinctive ears with crossed arms.',
   },
 
-  // ──── COLORS (9 questions)
+  // COLORS (9 questions)
   {
     id: 17,
     lesson: 'colors',
@@ -394,7 +391,7 @@ const ALL_QUESTIONS: Question[] = [
     explanation: 'Index finger drawn across the forehead = "Black."',
   },
 
-  // ──── FEELINGS (8 questions)
+  // FEELINGS (8 questions)
   {
     id: 26,
     lesson: 'feelings',
@@ -497,7 +494,6 @@ const ALL_QUESTIONS: Question[] = [
   },
 ];
 
-// ─── Single video player tile ─────────────────────────────────────────────────
 function VideoTile({
   videoKey,
   selected,
@@ -588,7 +584,6 @@ function VideoTile({
   );
 }
 
-// ─── Question Video Player ───────────────────────────────────────────────────
 function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   const player = useVideoPlayer(VIDEOS[videoKey], (p) => {
     p.loop = true;
@@ -619,7 +614,6 @@ function QuestionVideo({ videoKey }: { videoKey: VideoKey }) {
   );
 }
 
-// ─── Main Daily Challenge Quiz ────────────────────────────────────────────────
 interface Props {
   onComplete: (score: number) => void;
 }
@@ -795,7 +789,6 @@ export default function DailyChallengeQuiz({ onComplete }: Props) {
   );
 }
 
-// ─── Styles ──────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
